@@ -14,7 +14,7 @@
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="onCloseClicked(false, $event, ruleFormRef)">Cancel</el-button>
-                <el-button type="primary" @click="onCloseClicked(true, $event, ruleFormRef)">
+                <el-button type="primary" @click="onCloseClicked(true, $event, ruleFormRef)" :disabled="!isFormValid">
                     Save
                 </el-button>
             </div>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, reactive, ref, defineEmits } from 'vue'
+import { defineProps, reactive, ref, defineEmits, computed, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessageBox } from 'element-plus'
 import { useDialogStore } from '../stores/DialogStore';
@@ -50,6 +50,18 @@ let materialForm = reactive<RuleForm>({
     productCode: '',
     description: ''
 })
+
+const isFormValid = ref(false)
+
+const checkFormValidity = async () => {
+    if (ruleFormRef.value) {
+        ruleFormRef.value.validate((valid) => {
+            isFormValid.value = valid
+        })
+    }
+}
+
+watch(() => materialForm, checkFormValidity, { deep: true })
 
 const onCloseClicked = (isSubmit: boolean, event: Event, formEl: FormInstance | undefined) => {
     event.preventDefault()
