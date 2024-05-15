@@ -12,11 +12,11 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="onCloseClicked(false, $event, ruleFormRef)">Cancel</el-button>
-                <el-button type="primary" @click="onCloseClicked(true, $event, ruleFormRef)" :disabled="!isFormValid">
-                    Save
+            <div class="dialog-footer flex justify-center items-center gap-2">
+                <el-button type="success" @click="onCloseClicked(true, $event, ruleFormRef)" :disabled="!isFormValid">
+                    Add
                 </el-button>
+                <el-button @click="onCloseClicked(false, $event, ruleFormRef)">Cancel</el-button>
             </div>
         </template>
     </el-dialog>
@@ -31,7 +31,7 @@ import { MaterialListModel } from '../types/materialListModel';
 const dialogStore = useDialogStore()
 const emit = defineEmits(['closeModal'])
 const props = defineProps({
-    tableData: Array<MaterialListModel> 
+    tableData: Array<MaterialListModel>
 })
 interface RuleForm {
     material: string,
@@ -66,13 +66,14 @@ watch(() => materialForm, checkFormValidity, { deep: true })
 const onCloseClicked = (isSubmit: boolean, event: Event, formEl: FormInstance | undefined) => {
     event.preventDefault()
     if (!isSubmit) {
-        emit('closeModal', {isSubmit: false, data: null})
+        emit('closeModal', { isSubmit: false, data: null })
         dialogStore.addMaterialDialog.isShowModal = false
+        return
     }
     if (!formEl) return
     formEl.validate((valid) => {
         if (valid) {
-            const duplicate = props.tableData.some((item) => item.Material === materialForm.material && item.ProductCode === materialForm.productCode)
+            const duplicate = props.tableData.some((item) => item.Material.toLowerCase() === materialForm.material.toLowerCase() && item.ProductCode.toLowerCase() === materialForm.productCode.toLowerCase())
             if (duplicate) {
                 ElMessageBox.confirm(`Material: ${materialForm.material} and Product Code: ${materialForm.productCode} already exist`, {
                     showCancelButton: false,
@@ -80,10 +81,10 @@ const onCloseClicked = (isSubmit: boolean, event: Event, formEl: FormInstance | 
                     confirmButtonClass: 'bg-yellow-500',
                     type: 'warning',
                     center: true
-                }) 
+                })
                 return
             }
-            emit('closeModal', {isSubmit: true, data: materialForm})
+            emit('closeModal', { isSubmit: true, data: materialForm })
             dialogStore.addMaterialDialog.isShowModal = false
             return
         }

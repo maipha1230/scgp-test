@@ -205,6 +205,7 @@ const onAddDialogClose = (result: { isSubmit: boolean, data: MaterialFormModel }
   }
   fetchData.value = [...fetchData.value, ...newDataList]
   mappingTableData()
+  console.log('ADDED: ', newDataList)
   return
 }
 
