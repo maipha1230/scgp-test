@@ -38,6 +38,12 @@
         <el-table-column prop="Sum" label="Summary" width="150px" header-align="center" align="center" />
       </el-table>
     </div>
+    <div class="flex justify-end items-center">
+      <el-button type="primary" class="font-bold" @click="onSaveClicked">Save<el-icon
+          class="ml-2 text-lg">
+          <DocumentAdd />
+        </el-icon></el-button>
+    </div>
   </div>
 
   <!-- Dialog Add Material -->
@@ -102,7 +108,7 @@ const groupMaterialData = (materialData: MaterialListModel[]): any[] => {
   const groupedData: { [key: string]: any } = materialData.reduce((acc, item) => {
     const { Material, ProductCode, Location, QTY } = item;
     const key = `${Material}-${ProductCode}`;
-    
+
     if (!acc[key]) {
       acc[key] = {
         Material,
@@ -203,10 +209,40 @@ const onAddDialogClose = (result: { isSubmit: boolean, data: MaterialFormModel }
     }
     newDataList.push(newData)
   }
-  fetchData.value = [...fetchData.value, ...newDataList]
+
+  let oldData: MaterialListModel[] = []
+  tableData.value.forEach((item) => {
+    columnZone.value.forEach((header) => {
+      oldData.push({
+        Material: item.Material,
+        ProductCode: item.ProductCode,
+        Location: header.prop,
+        QTY: Number(item[header.prop].qty)
+      })
+    })
+  })
+
+  fetchData.value = [...oldData, ...newDataList]
   mappingTableData()
   console.log('ADDED: ', newDataList)
+  dialogStore.showSuccessDialog(`${result.data.material} has been added`)
   return
+}
+
+const onSaveClicked = () => {
+  let data: MaterialListModel[] = []
+  tableData.value.forEach((item) => {
+    columnZone.value.forEach((header) => {
+      data.push({
+        Material: item.Material,
+        ProductCode: item.ProductCode,
+        Location: header.prop,
+        QTY: Number(item[header.prop].qty)
+      })
+    })
+  })
+  data = data.filter((item) => Number(item.QTY) > 0)
+  console.log('Save: ', data)
 }
 
 

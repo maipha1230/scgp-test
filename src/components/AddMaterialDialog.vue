@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, reactive, ref, defineEmits, computed, watch } from 'vue'
+import { defineProps, reactive, ref, defineEmits, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessageBox } from 'element-plus'
 import { useDialogStore } from '../stores/DialogStore';
@@ -75,13 +75,7 @@ const onCloseClicked = (isSubmit: boolean, event: Event, formEl: FormInstance | 
         if (valid) {
             const duplicate = props.tableData.some((item) => item.Material.toLowerCase() === materialForm.material.toLowerCase() && item.ProductCode.toLowerCase() === materialForm.productCode.toLowerCase())
             if (duplicate) {
-                ElMessageBox.confirm(`Material: ${materialForm.material} and Product Code: ${materialForm.productCode} already exist`, {
-                    showCancelButton: false,
-                    confirmButtonText: 'CLOSE',
-                    confirmButtonClass: 'bg-yellow-500',
-                    type: 'warning',
-                    center: true
-                })
+                dialogStore.showWarningDialog(`Material: ${materialForm.material} and Product Code: ${materialForm.productCode} already exist`)
                 return
             }
             emit('closeModal', { isSubmit: true, data: materialForm })
